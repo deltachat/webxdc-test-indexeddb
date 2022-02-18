@@ -8,39 +8,40 @@
         <script>
 
             var indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB || window.shimIndexedDB;
+            if (indexedDB) {
+                var open = indexedDB.open("MyDatabase12", 1);
 
-            var open = indexedDB.open("MyDatabase9", 1);
-
-            open.onupgradeneeded = function() {
-                document.writeln("initializing database<br>");
-                var db = open.result;
-                var store = db.createObjectStore("MyObjectStore", {keyPath: "id"});
-                store.createIndex("NameIndex", ["counter"]);
-            };
-
-            open.onsuccess = function() {
-                var db = open.result;
-                var tx = db.transaction("MyObjectStore", "readwrite");
-                var store = tx.objectStore("MyObjectStore");
-
-                var getJohn = store.get(12345);
-
-                getJohn.onsuccess = function() {
-                    var cnt = 0;
-                    if (typeof getJohn.result == "undefined") {
-                        cnt = 1;
-                    } else {
-                        cnt = parseInt(getJohn.result.counter) + 1;
-                    }
-                    document.writeln("counter: " + cnt + "<br>");
-                    store.put({id: 12345, counter: cnt});
+                open.onupgradeneeded = function () {
+                    var db = open.result;
+                    var store = db.createObjectStore("MyObjectStore", {keyPath: "id"});
+                    store.createIndex("NameIndex", ["counter"]);
                 };
 
-                tx.oncomplete = function() {
-                    db.close();
-                };
+                open.onsuccess = function () {
+                    var db = open.result;
+                    var tx = db.transaction("MyObjectStore", "readwrite");
+                    var store = tx.objectStore("MyObjectStore");
+
+                    var getter = store.get(12345);
+
+                    getter.onsuccess = function () {
+                        var cnt = 0;
+                        if (typeof getter.result == "undefined") {
+                            cnt = 1;
+                        } else {
+                            cnt = parseInt(getter.result.counter) + 1;
+                        }
+                        document.writeln("IndexDB working, xcounter: " + cnt + "<br>");
+                        store.put({id: 12345, counter: cnt});
+                    };
+
+                    tx.oncomplete = function () {
+                        db.close();
+                    };
+                }
+            } else {
+                document.writeln("IndexDB not available<br>");
             }
-
 
         </script>
     </body>
