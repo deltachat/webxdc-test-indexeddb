@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <script src="webxdc.js"></script>
+    </head>
+    <body>
+        <script>
+
+            var indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB || window.shimIndexedDB;
+
+            var open = indexedDB.open("MyDatabase3", 1);
+
+            open.onupgradeneeded = function() {
+                var db = open.result;
+                var store = db.createObjectStore("MyObjectStore", {keyPath: "id"});
+                store.createIndex("NameIndex", ["counter"]);
+                alert(1);
+            };
+
+            open.onsuccess = function() {
+                // Start a new transaction
+                var db = open.result;
+                var tx = db.transaction("MyObjectStore", "readwrite");
+                var store = tx.objectStore("MyObjectStore");
+
+                store.put({id: 12345, counter: 12});
+
+                var getJohn = store.get(12345);
+
+                getJohn.onsuccess = function() {
+                    document.writeln(getJohn.result.counter);
+                };
+
+                tx.oncomplete = function() {
+                    db.close();
+                };
+            }
+
+
+        </script>
+    </body>
+</html>
