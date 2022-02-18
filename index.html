@@ -9,27 +9,31 @@
 
             var indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB || window.shimIndexedDB;
 
-            var open = indexedDB.open("MyDatabase3", 1);
+            var open = indexedDB.open("MyDatabase9", 1);
 
             open.onupgradeneeded = function() {
+                document.writeln("initializing database<br>");
                 var db = open.result;
                 var store = db.createObjectStore("MyObjectStore", {keyPath: "id"});
                 store.createIndex("NameIndex", ["counter"]);
-                alert(1);
             };
 
             open.onsuccess = function() {
-                // Start a new transaction
                 var db = open.result;
                 var tx = db.transaction("MyObjectStore", "readwrite");
                 var store = tx.objectStore("MyObjectStore");
 
-                store.put({id: 12345, counter: 12});
-
                 var getJohn = store.get(12345);
 
                 getJohn.onsuccess = function() {
-                    document.writeln(getJohn.result.counter);
+                    var cnt = 0;
+                    if (typeof getJohn.result == "undefined") {
+                        cnt = 1;
+                    } else {
+                        cnt = parseInt(getJohn.result.counter) + 1;
+                    }
+                    document.writeln("counter: " + cnt + "<br>");
+                    store.put({id: 12345, counter: cnt});
                 };
 
                 tx.oncomplete = function() {
