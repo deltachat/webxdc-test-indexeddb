@@ -1,4 +1,6 @@
-# Test IndexedDB
+this test is now part of https://github.com/webxdc/webxdc-test
+
+#Test IndexedDB
 
 with this Webxdc you can test if:
 
